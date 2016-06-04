@@ -155,11 +155,11 @@ The behaviors between an app’s interface controllers is managed by WKExtension
 #### WKInterfaceController
 Like the UIViewController from UIKit, WKInterfaceController handles implement of Watch app’s interface. The only difference is that WKInterfaceController doesn’t manage any actual views. It can only manage the behavior of an interface controller remotely from inside of WatchKit extension.
 #### WKInterfaceButton
-This is the corresponding class of UIButton in WatchKit. Each object represents a button on the screen. When the button is tapped by the user, the object calls a related function.
+This is the corresponding class of UIButton in WatchKit. Each object represents a button on the screen. When the button is interacted by the user, the object calls a related function.
 #### WKInterfaceLabel
 Same as UILabel, WKInterfaceLabel implements a read-only text view. Application can change the content of the label through this object. And this object can also style the text.
 #### WCSession
-In fact WCSession is not a WatchKit class, but this is very important in Watch application. The WCSession class performs communication between a WatchKit extension and its companion iOS app. In order to communicate, a WCSession object need to be created and then activated on both sides. After activation, the two sides can send information back and forth.
+In fact WCSession is not one of WatchKit classes, but this is very important in Watch application. The WCSession class performs communication between a WatchKit extension and its companion iOS app. In order to communicate, a WCSession object need to be created and activated on both sides. After activation, the two sides can send information back and forth.
 
 ## Code Example
 
