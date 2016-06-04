@@ -129,3 +129,99 @@ There are also many plugins and adapters for hybrid applications to make use of 
 - [Vibration](https://github.com/apache/cordova-plugin-vibration) 
 
 Technically one could write an application purely based on Javascript, that uses a small adapter to access an Apple Watch using the WatchKit. Even more helpful would be a home automation app, that accesses the home's devices through HomeKit using native objective-c code. All the logic for displaying and managing the assets however would be written in web technologies. This way, the application can also run on an Android, where it would then use the Nest APIs, Weave or Brillo, the pendants to Apples HomeKit
+
+# WatchKit for iOS
+
+During Apple's WWDC 2014, Apple has released their new product, Apple Watch, along with its SDK WatchKit.
+WatchKit is a framework that helps developers to create their Apple Watch application on xCode using Obejctive-C or Swift.
+The process for creating a Watch app is not much different from creating an iOS app. It uses storyboard to design the layout and it has controller classes that connect with UI component for custom code. It won’t require a lot of works to deploy an existing iOS app to Apple Watch. But there are some new concepts about this framework are essential for developers.
+
+## Technical introduction
+
+### Structure of a WratchKit app
+
+The interfaces of an application are composed of Watch application and WatchKit. When user opens an app, watchOS first loads the user interface. Meanwhile, WatchKit extension, which manages the content of interface, was launched by watchOS. The image below demonstrates the relationship between the Watch app, the WatchKit extension, and the iOS app.
+![](https://developer.apple.com/library/watchos/documentation/General/Conceptual/WatchKitProgrammingGuide/Art/architecture_compared_2x.png)
+The life cycle of Watch app is drived by user interactions. There are three ways to open an app, click it from Home scren, interact with glance and coplication, or view the notifications. After opened, the app will keep alive as long as the user is interacting with it. The WatchKit extension is responsible for exchanging information. And iOS will suspend WatchKit extension if user stops interacting.
+
+During the launch, the storyboard scene will be loaded first in response to user’s interaction. Then, the WatchKit extension will create a corresponding interface controller object allows the application to display the scene.
+![](https://developer.apple.com/library/watchos/documentation/General/Conceptual/WatchKitProgrammingGuide/Art/launch_cycle_2x.png)
+As mentioned before, as long as the user is interactiong with the app, it keeps alive. Once the user stops interacting with Apple watch or exits the app, iOS will suspend the interface controller and the the extension.
+![](https://developer.apple.com/library/watchos/documentation/General/Conceptual/WatchKitProgrammingGuide/Art/watch_app_lifecycle_simple_2x.png)
+### Key classes of WatchKit
+
+#### WKExtension
+The behaviors between an app’s interface controllers is managed by WKExtension object. When the app is launched, a WKExtension object will be created by the system. Thisobject performs app-level tasks.
+#### WKInterfaceController
+Like the UIViewController from UIKit, WKInterfaceController handles implement of Watch app’s interface. The only difference is that WKInterfaceController doesn’t manage any actual views. It can only manage the behavior of an interface controller remotely from inside of WatchKit extension.
+#### WKInterfaceButton
+This is the corresponding class of UIButton in WatchKit. Each object represents a button on the screen. When the button is tapped by the user, the object calls a related function.
+#### WKInterfaceLabel
+Same as UILabel, WKInterfaceLabel implements a read-only text view. Application can change the content of the label through this object. And this object can also style the text.
+#### WCSession
+In fact WCSession is not a WatchKit class, but this is very important in Watch application. The WCSession class performs communication between a WatchKit extension and its companion iOS app. In order to communicate, a WCSession object need to be created and then activated on both sides. After activation, the two sides can send information back and forth.
+
+## Code Example
+
+To connect Apple watch with the application on the phone,  Watch Connectivity is the solution to work on it. WCSession will help to send and receive message between watch application and parent iOS application. The first thing is check that WCSessions is supported in the application or not.
+
+First of all, we have to import WatchConnectivity and WCSessionDelegate to InterfaceController.m and input the code to activate WCSession in (void)willActivate
+```objectivec
+#import <WatchConnectivity/WatchConnectivity.h>
+
+@interface InterfaceController()<WCSessionDelegate>
+
+- (void)willActivate {
+    // This method is called when watch view controller is about to be visible to user
+    [super willActivate];
+
+    if([WCSession isSupported]){
+        WCSession *session = [WCSession defaultSession];
+        session.delegate = self;
+        [session activateSession];
+    }
+}
+```
+This is the basic way to create a WCSession. This is the step that need for every time when we want to use WCSession. Next step is to create the method to send the data by using WCSession. NSDictionary will be use in this step. Key value in NSDictionary can be changed if we want to send other data. The code to handler the error and reply from the iOS application can be write in this method by using replyHandler and errorHandler in sendMessage function.
+```objectivec
+- (void) sendCommand:(NSString*) cmdString{
+    NSDictionary *applicationData = [[NSDictionary alloc] initWithObjects:@[cmdString] forKeys:@[@"cmdValue"]];
+
+    [[WCSession defaultSession] sendMessage:applicationData
+                               replyHandler:^(NSDictionary *reply) {
+                                   //handle reply from iPhone app here
+                               }
+                               errorHandler:^(NSError *error) {
+                                   //catch any errors here
+                               }
+     ];
+}
+```
+To receive data, this method has to implemented in your code. This code will implement into ViewController.m in the parent app. The objectForKey in this code need to be the same as the key that send from NSDictionary. It will return the data in NSString and we can use it to do other job in the application. In this example, we will send the data and use it to control the WebView in the parent application.
+```objectivec
+- (void)session:(nonnull WCSession *)session didReceiveMessage:(nonnull NSDictionary<NSString *,id> *)message replyHandler:(nonnull void (^)(NSDictionary<NSString *,id> * __nonnull))replyHandler {
+    NSString *cmdValue = [message objectForKey:@"cmdValue"];
+    if([cmdValue isEqualToString:@"Back"]){
+        [_webView goBack];
+    }
+    else if([cmdValue isEqualToString:@"Forward"]){
+        [_webView goForward];
+    }
+    else if([cmdValue isEqualToString:@"Refresh"]){
+        [_webView reload];
+    }
+    else if([cmdValue isEqualToString:@"Favourite"]){
+        NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+        NSString *favouriteURL = [prefs stringForKey:@"favouriteURL"];
+        [self webViewTo:favouriteURL];
+    }
+    else{
+    }
+}
+```
+## Practical use cases
+
+Since Apple released the WatchKit SDK in 2014. This SDK help developer to craete the Apple Watch application to connect with the application in iPhone or iPad. Generally, developer always use Apple Watch application to send the notification from parent app to Apple Watch and use it to display some data. We can see that in the instant messaging application such as Skype, WeChat, Line or Kakao talk. Not only the instant messaging application, other apllication also use notification to help iOS users see the notifications easier by using Apple Watch and they can do some action with the watch without take their phone out.
+
+The other thing that can make Apple Watch more interesting is using it with game. With the connectivity between Apple Watch and iOS devices. It can create some interesting game that use Apple Watch to play. Apple Watch can be a special helper to play the game. With the Apple Watch features we can create some interesting things that can be use in the game such as notify you that other player is around here and you can play with them or use your distance that you walk or run in a week to claim some special items in the game.
+
