@@ -1,8 +1,44 @@
-# WebKit for iOS
+<style type="text/css">
+body{
+    max-width: 1200px;
+    margin: 100px auto !important;
+    display: block; 
+  }
+  </style>
+
+<div style="text-align: center !important;">
+  <img src="http://www.studyinaus.com/wp-content/uploads/2014/02/UTS-logo.jpg" style="width: 400px;">
+
+
+# Technical report for WebKit and WatchKit 
+
+
+<ul style="list-style-position: inside;">
+  <li>Pascal Brokmeier - 12537015</li>
+  <li>Piyawut Chantasrisawat - 99153025</li>
+  <li>Tianxiang Zhan - 12096830</li>
+</ul>
+
+
+
+</div>
+---
+
+## Content
+<div id="toc"><!--TOC gets placed in here automatically --></div>
+
+---
+
+
+
+# WebKit for iOS <a name="webKit"></a>
+
+**To watch a live demo of the developed software demo please [click here](https://goo.gl/photos/fzqwr3V6HpTQSFKw5) for a 15 minute tutorial video.**
 
 WebKit allows developers to **display web content within their apps** without forcing the user to navigate between apps or switching to the browser. It can be considered a frameless inline version of Safari, which can be displayed at any point of the UI and renders HTML websites just like a normal browser. The framework also implements a navigation history and exposes it to the API. It offers several ways of customising the WebView, restricting a users navigation possibilities, the content that will be displayed, the local storage amount and so on. 
 
 Using this framework, applications can reuse existing web technology already developed by an organisation and therefore save developing cost. Sometimes it may also be beneficial to use HTML, e.g. when displaying documents or style sensitive graphics for which the web and CSS3 was built for. This way, a company can also reuse its existing skillset of frontend developers as well as hire professional design agencies who usually possess lots of skills in the web stack.
+
 
 
 ## Technical introduction
@@ -130,7 +166,7 @@ There are also many plugins and adapters for hybrid applications to make use of 
 
 Technically one could write an application purely based on Javascript, that uses a small adapter to access an Apple Watch using the WatchKit. Even more helpful would be a home automation app, that accesses the home's devices through HomeKit using native objective-c code. All the logic for displaying and managing the assets however would be written in web technologies. This way, the application can also run on an Android, where it would then use the Nest APIs, Weave or Brillo, the pendants to Apples HomeKit
 
-# WatchKit for iOS
+#WatchKit for iOS <a name="watchkit"></a>
 
 During Apple's WWDC 2014, Apple has released their new product, Apple Watch, along with its SDK WatchKit.
 WatchKit is a framework that helps developers to create their Apple Watch application on xCode using Obejctive-C or Swift.
@@ -224,4 +260,86 @@ To receive data, this method has to implemented in your code. This code will imp
 Since Apple released the WatchKit SDK in 2014. This SDK help developer to craete the Apple Watch application to connect with the application in iPhone or iPad. Generally, developer always use Apple Watch application to send the notification from parent app to Apple Watch and use it to display some data. We can see that in the instant messaging application such as Skype, WeChat, Line or Kakao talk. Not only the instant messaging application, other apllication also use notification to help iOS users see the notifications easier by using Apple Watch and they can do some action with the watch without take their phone out.
 
 The other thing that can make Apple Watch more interesting is using it with game. With the connectivity between Apple Watch and iOS devices. It can create some interesting game that use Apple Watch to play. Apple Watch can be a special helper to play the game. With the Apple Watch features we can create some interesting things that can be use in the game such as notify you that other player is around here and you can play with them or use your distance that you walk or run in a week to claim some special items in the game.
+
+
+
+<!-- Tooling: -->
+<style type="text/css">
+hr{
+opacity:0 !important;
+}
+</style>
+
+<style type="text/css">
+#toc .h1 {
+    text-indent: .25in;
+}
+#toc .h2 {
+    text-indent: .5in;
+}
+#toc .h3 {
+    text-indent: .75in;
+}
+#toc .h4 {
+    text-indent: 1in;
+}
+#toc .h5 {
+    text-indent: 1.25in;
+}
+#toc .h6 {
+    text-indent: 1.5in;
+}
+</style>
+<script type="text/javascript">
+/*jslint
+    white: true,
+    browser: true,
+    vars: true
+*/
+
+/**
+ * Generates a table of contents for your document based on the headings
+ *  present. Anchors are injected into the document and the
+ *  entries in the table of contents are linked to them. The table of
+ *  contents will be generated inside of the first element with the id `toc`.
+ * @param {HTMLDOMDocument} documentRef Optional A reference to the document
+ *  object. Defaults to `document`.
+ * @author Matthew Christopher Kastor-Inare III
+ * @version 20130726
+ * @example
+ * // call this after the page has loaded
+ * htmlTableOfContents();
+ */
+function htmlTableOfContents (documentRef) {
+    var documentRef = documentRef || document;
+    var toc = documentRef.getElementById('toc');
+    var headings = [].slice.call(documentRef.body.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+    headings.forEach(function (heading, index) {
+        var anchor = documentRef.createElement('a');
+        anchor.setAttribute('name', 'toc' + index);
+        anchor.setAttribute('id', 'toc' + index);
+        
+        var link = documentRef.createElement('a');
+        link.setAttribute('href', '#toc' + index);
+        link.textContent = heading.textContent;
+        
+        var div = documentRef.createElement('div');
+        div.setAttribute('class', heading.tagName.toLowerCase());
+        
+        div.appendChild(link);
+        toc.appendChild(div);
+        heading.parentNode.insertBefore(anchor, heading);
+    });
+}
+
+try {
+     module.exports = htmlTableOfContents;
+} catch (e) {
+    // module.exports is not defined
+}
+
+window.onload = function() {
+  htmlTableOfContents();
+};
+</script>
 
