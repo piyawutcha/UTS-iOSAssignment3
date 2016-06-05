@@ -110,12 +110,19 @@
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message {
 
     NSString * msgString = [NSString stringWithFormat:@"%@", message.body];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Message received from WebKit"
-                                                    message:msgString
-                                                   delegate:nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil];
-    [alert show];
+    
+    //create a controller for the alert box
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:msgString preferredStyle:UIAlertControllerStyleAlert];
+    //add an ok action to it
+    UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * action)
+                         {
+                             [alert dismissViewControllerAnimated:YES completion:nil];
+                             
+                         }];
+    [alert addAction:ok];
+
+    //show the modal
+    [self presentViewController:alert animated:NO completion:nil];
 }
 
 - (void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
